@@ -26,5 +26,6 @@ $HOME/.wireshark/plugins/
 ```
 The directory can change by the location of instalation of wireshak. 
 
-Once the file was inserted into wireshak plugins folder, restart wireshak app by close all running instances and start them again, after the wireshark initialization, the plugins will be readed and you'll can interpretate the protocols by file dissectors. 
+#### Once the file was inserted into wireshak plugins folder, restart wireshak app by close all running instances and start them again, after the wireshark initialization, the plugins will be readed and you'll can interpretate the protocols by file dissectors. 
+
 ---
