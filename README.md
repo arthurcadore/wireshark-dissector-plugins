@@ -1,6 +1,6 @@
 # Dissector Plugins for Wireshrk
 
-## This repository is dedicated to dissector (.lua) files to be used as plugins in Wireshark software. 
+## This repository contains Lua dissector files that serve as plugins for the Wireshark software.
 
 ---
 ### Prerequisites: 
@@ -11,21 +11,30 @@
 --- 
 ### Getting Started: 
 
-First, navigate on the repository and find the dissector file you want to use. **Once the file is located, download and insert it on the following directory:**
+Clone the repository and locate the dissector file you wish to use. To do that, use the following command: 
+
+```
+git clone https://github.com/arthurcadore/wireshark-dissector-plugins
+```
+
+The file can be download directly by navigate in the repository and click on "download" button of the file visualizer. 
+
+---
+#### Once the file was downloaded, insert the file into the appropriate directory:
 
 - For Windows:
 ```
 C:\Program Files\Wireshark\plugins\
 ```
-The directory can change by the location of instalation of wireshak. 
+(The directory can change by the location of instalation of wireshak.)
 
 - For linux (Ubuntu 22.04):
 
 ```
 $HOME/.wireshark/plugins/
 ```
-The directory can change by the location of instalation of wireshak. 
+(The directory can change by the location of instalation of wireshak.)
 
-#### Once the file was inserted into wireshak plugins folder, restart wireshak app by close all running instances and start them again, after the wireshark initialization, the plugins will be readed and you'll can interpretate the protocols by file dissectors. 
-
+#### Restart Wireshark:
+Close all running instances of Wireshark and start it again. After Wireshark initializes, the plugins will be loaded, and you'll be able to interpret protocols using the dissector files.
 ---
