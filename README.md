@@ -6,4 +6,24 @@
 ### Prerequisites: 
 
 - Version 4.0.6-gac2f5a01286a of Wireshak or above.
+- Git version 2.34.1 (for repository clone)
 
+--- 
+### Getting Started: 
+
+First, navigate on the repository and find the dissector file you want to use. **Once the file is located, download and insert it on the following directory:**
+
+- For Windows:
+```
+C:\Program Files\Wireshark\plugins\
+```
+The directory can change by the location of instalation of wireshak. 
+
+- For linux (Ubuntu 22.04):
+
+```
+$HOME/.wireshark/plugins/
+```
+The directory can change by the location of instalation of wireshak. 
+
+---
