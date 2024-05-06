@@ -32,7 +32,7 @@ function dldp.dissector(buffer, pinfo, tree)
     -- checking if the slow protocol subtype is equal to 0x00
     if buffer(0, 1):uint() == 0x00 then
 
-        -- Calculating the password lenght looking for 0x00000000 array on packet. 
+        -- Calculating the password length looking for 0x00000000 array on packet. 
         local password_end = buffer:len() - 4
         local password_length = 0
         for i=6, password_end do
@@ -61,7 +61,8 @@ function dldp.dissector(buffer, pinfo, tree)
 
         -- Adding field for DLDP sequence number 
         subtree:add(fields.sequence, buffer(6 + password_length + 14, 2):uint())
-        pinfo.cols.info:set("DLDP Packet")
+        
+        pinfo.cols.info:set("DLDP Packet, MAC: " .. tostring(buffer(6 + password_length + 8, 6)) .. ", Interval: " .. tostring(buffer(6 + password_length + 4, 2):uint()))
     else
         pinfo.cols.info:set("General-Slow-Protocol-Packet")
     end
