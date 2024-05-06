@@ -61,8 +61,8 @@ function dldp.dissector(buffer, pinfo, tree)
 
         -- Adding field for DLDP sequence number 
         subtree:add(fields.sequence, buffer(6 + password_length + 14, 2):uint())
-        
-        pinfo.cols.info:set("DLDP Packet, MAC: " .. tostring(buffer(6 + password_length + 8, 6)) .. ", Interval: " .. tostring(buffer(6 + password_length + 4, 2):uint()))
+
+        pinfo.cols.info:set("DLDP, SRC_IF_MAC: " .. tostring(buffer(6 + password_length + 8, 6)) .. ", Interval: " .. tostring(buffer(6 + password_length + 4, 2):uint()))
     else
         pinfo.cols.info:set("General-Slow-Protocol-Packet")
     end
