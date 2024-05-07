@@ -38,7 +38,7 @@ Description: The Ethernet Frame Header Field consists of 6 bytes for the destina
 - Ethernet Slow-Protocols subtype Field: 
 --- 
 ```
-00
+00r
 ```
 
 Description: This field is used for DLDP segmentation on slow-protocols ethernet type.

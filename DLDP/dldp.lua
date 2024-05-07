@@ -6,17 +6,26 @@ local dldp = Proto("dldp", "Device Link Detection Protocol")
 
 -- Defining the fields of the protocol
 local fields = dldp.fields
-fields.sequence = ProtoField.uint16("dldp.sequence", "Sequence Number")
+fields.sequence = ProtoField.uint16("dldp.sequence", "Source Interface Index")
 fields.mac_src = ProtoField.bytes("dldp.mac_src", "Source Interface MAC")
-fields.interval = ProtoField.uint16("dldp.interval", "DLDP Interval (seconds)")
-fields.password = ProtoField.string("dldp.password", "DLDP Password")
-fields.flags = ProtoField.bytes("dldp.flags", "DLDP Config Flags")
+fields.interval = ProtoField.uint16("dldp.interval", "Interval (seconds)")
+fields.password = ProtoField.string("dldp.password", "Password")
+fields.id = ProtoField.bytes("dldp.id", "DLDP ID")
+fields.version = ProtoField.bytes("dldp.version", "DLDP Version")
+fields.packet_type = ProtoField.bytes("dldp.packet_type", "DLDP Packet Type")
+fields.flags = ProtoField.bytes("dldp.flags", "Flags")
+fields.neighbour1 = ProtoField.bytes("dldp.neighbour1", "Source Neighbour MAC")
+fields.neighbour2 = ProtoField.bytes("dldp.neighbour2", "Destination Neighbour MAC")
 
--- Defining individual flags
-fields.flag1 = ProtoField.uint8("dldp.flag1", "Flag 1", base.HEX)
-fields.flag2 = ProtoField.uint8("dldp.flag2", "Flag 2", base.HEX)
-fields.flag3 = ProtoField.uint8("dldp.flag3", "Flag 3", base.HEX)
-fields.flag4 = ProtoField.uint8("dldp.flag4", "Flag 4", base.HEX)
+-- Mapping for packet_type values to their corresponding strings
+local packet_type_map = {
+    [0x01] = "ADVERTISEMENT",
+    [0x02] = "RECOVER-PROBE",
+    [0x03] = "PROBE",
+    [0x08] = "ECHO",
+    [0x09] = "RECOVER-ECHO",
+    [0x06] = "ECHO"
+}
 
 -- Defining the dissector function
 function dldp.dissector(buffer, pinfo, tree)
@@ -31,6 +40,15 @@ function dldp.dissector(buffer, pinfo, tree)
 
     -- checking if the slow protocol subtype is equal to 0x00
     if buffer(0, 1):uint() == 0x00 then
+        -- Add a subtree for DLDP header
+        local dldp_subtree = subtree:add(dldp, buffer(), "DLDP Header")
+        dldp_subtree:add(fields.id, buffer(1, 1))
+        dldp_subtree:add(fields.version, buffer(2, 1))
+        local packet_type_value = buffer(3, 1):uint()
+        local packet_type_str = packet_type_map[packet_type_value] or tostring(packet_type_value)
+        local packet_type = dldp_subtree:add(fields.packet_type, buffer(3, 1))
+        packet_type:append_text(" (" .. packet_type_str .. ")")
+        dldp_subtree:add(fields.flags, buffer(4, 1))
 
         -- Calculating the password length looking for 0x00000000 array on packet. 
         local password_end = buffer:len() - 4
@@ -42,13 +60,6 @@ function dldp.dissector(buffer, pinfo, tree)
                 break
             end
         end
-
-        -- Adding subfields to DLDP data flags 
-        local flags = buffer(2, 4):le_uint()
-        subtree:add(fields.flag1, buffer(2, 1))
-        subtree:add(fields.flag2, buffer(3, 1))
-        subtree:add(fields.flag3, buffer(4, 1))
-        subtree:add(fields.flag4, buffer(5, 1))
 
         -- Adding field for password 
         subtree:add(fields.password, buffer(6, password_length):string())
@@ -62,7 +73,16 @@ function dldp.dissector(buffer, pinfo, tree)
         -- Adding field for DLDP sequence number 
         subtree:add(fields.sequence, buffer(6 + password_length + 14, 2):uint())
 
-        pinfo.cols.info:set("DLDP, SRC_IF_MAC: " .. tostring(buffer(6 + password_length + 8, 6)) .. ", Interval: " .. tostring(buffer(6 + password_length + 4, 2):uint()))
+        -- Add neighbour fields for packet_type 0x03 and 0x09
+        if packet_type_value == 0x03 then
+            subtree:add(fields.neighbour1, buffer(34, 6))
+            subtree:add(fields.neighbour2, buffer(42, 6))
+        elseif packet_type_value == 0x09 then
+            subtree:add(fields.neighbour1, buffer(34, 6))
+            subtree:add(fields.neighbour2, buffer(42, 6))
+        end
+
+        pinfo.cols.info:set("DLDP, SRC_IF_MAC: " .. tostring(buffer(6 + password_length + 8, 6)) .. ", Type: " .. packet_type_str)
     else
         pinfo.cols.info:set("General-Slow-Protocol-Packet")
     end
